@@ -1,0 +1,51 @@
+{
+  "Böcker": [
+    {
+      "Id": 1,
+      "Titel": "Pippi Långstrump",
+      "FörfattareId": 1,
+      "Genre": "Barn",
+      "Publiceringsår": 1945,
+      "Isbn": "1234567890",
+      "Recensioner": [ 5, 4, 5 ]
+    },
+    {
+      "Id": 2,
+      "Titel": "Csharp",
+      "FörfattareId": 2,
+      "Genre": "Datatech",
+      "Publiceringsår": 2015,
+      "Isbn": "9876543210",
+      "Recensioner": [ 5, 5, 4, 5 ]
+    },
+    {
+      "Id": 3,
+      "Titel": "Programmering for absolut beginners",
+      "FörfattareId": 1,
+      "Genre": "Datatach",
+      "Publiceringsår": 2017,
+      "Isbn": "1122334455",
+      "Recensioner": [ 4, 4, 3 ]
+    }
+  ],
+  "Författare": [
+    {
+      "Id": 1,
+      "Namn": "Astrid Lindgren",
+      "Land": "Sverige",
+      "BokIds": [ 1, 3 ]
+    },
+    {
+      "Id": 2,
+      "Namn": "J.K. Rowling",
+      "Land": "Storbritannien",
+      "BokIds": [ 2 ]
+    },
+    {
+      "Id": 3,
+      "Namn": "Albahari Joseph & Ben Albahari",
+      "Land": "Czech Republic",
+      "BokIds": [ 2 ]
+    }
+  ]
+} 

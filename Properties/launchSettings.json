@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "Advd_Bibliotekhanteringsystem": {
+      "commandName": "Project"
+    },
+    "Container (Dockerfile)": {
+      "commandName": "Docker"
+    }
+  }
+}
