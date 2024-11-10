@@ -1,6 +1,6 @@
-﻿using Newtonsoft.Json;
-using System;
+﻿using System;
 using System.IO;
+using System.Text.Json;
 
 namespace Advd_Bibliotekhanteringsystem
 {
@@ -13,7 +13,7 @@ namespace Advd_Bibliotekhanteringsystem
         {
             try
             {
-                var jsonData = JsonConvert.SerializeObject(bibliotek, Formatting.Indented);
+                var jsonData = JsonSerializer.Serialize(bibliotek, new JsonSerializerOptions { WriteIndented = true });
                 File.WriteAllText(Filnamn, jsonData);
                 Console.WriteLine("Data har sparats.");
             }
@@ -31,7 +31,7 @@ namespace Advd_Bibliotekhanteringsystem
                 if (File.Exists(Filnamn))
                 {
                     var jsonData = File.ReadAllText(Filnamn);
-                    var bibliotek = JsonConvert.DeserializeObject<Bibliotek>(jsonData);
+                    var bibliotek = JsonSerializer.Deserialize<Bibliotek>(jsonData);
                     return bibliotek;
                 }
                 else
