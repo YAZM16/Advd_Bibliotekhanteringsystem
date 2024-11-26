@@ -8,12 +8,13 @@ namespace Advd_Bibliotekhanteringsystem
 {
     public class Bibliotek
     {
-        [JsonIgnore]
+       
         public List<Bok> Böcker { get; set; } = new List<Bok>();
-        [JsonIgnore]
+        
         public List<Författare> Författare { get; set; } = new List<Författare>();
 
-        private const string Filnamn = "LibraryData.json";
+         private const string Filnamn = @"C:\Users\user\source\repos\Advd_Bibliotekhanteringsystem_1\LibraryData.json";
+
 
         public Bibliotek()
         {
@@ -117,38 +118,83 @@ namespace Advd_Bibliotekhanteringsystem
             SparaData();
         }
 
-        // Lista alla böcker
-        public void ListaAllaBöcker()
+       public void ListaAllaBöcker()
         {
-            if (Böcker.Any())
+            if (!Böcker.Any()) // Kontrollerar om det finns några böcker i listan.
             {
-                foreach (var bok in Böcker)
-                {
-                    Console.WriteLine($"ID: {bok.Id}, Titel: {bok.Titel}, Genre: {bok.Genre}, Publiceringsår: {bok.Publiceringsår}");
-                }
+                Console.WriteLine("Inga böcker finns i biblioteket."); // Meddelar användaren om listan är tom.
+                return;
             }
-            else
+
+            // Sorterar böckerna i alfabetisk ordning baserat på deras titel.
+            var sorteradeBöcker = Böcker.OrderBy(b => b.Titel).ToList();
+
+            // Loopar igenom varje bok och skriver ut dess detaljer.
+            foreach (var bok in sorteradeBöcker)
             {
-                Console.WriteLine("Inga böcker finns.");
+                var författare = Författare.FirstOrDefault(f => f.Id == bok.FörfattareId)?.Namn ?? "Okänd författare";
+                Console.WriteLine($"ID: {bok.Id}, Titel: {bok.Titel}, Författare: {författare}, Genre: {bok.Genre}, Publiceringsår: {bok.Publiceringsår}");
             }
         }
 
+        /// <summary>
+        /// Filtrerar böcker baserat på en angiven genre.
+        /// </summary>
+        /// <param name="genre">Den genre som böcker ska filtreras efter.</param>
         // Lista alla författare
         public void ListaAllaFörfattare()
         {
-            if (Författare.Any())
+            if (!Författare.Any())
             {
-                foreach (var författare in Författare)
-                {
-                    Console.WriteLine($"ID: {författare.Id}, Namn: {författare.Namn}, Land: {författare.Land}");
-                }
+                Console.WriteLine("Inga författare finns i biblioteket.");
+                return;
+            }
+
+            foreach (var författare in Författare)
+            {
+                Console.WriteLine($"ID: {författare.Id}, Namn: {författare.Namn}, Land: {författare.Land}");
+            }
+        }
+
+        // Filtrera böcker efter författare
+        public void FiltreraBöckerEfterFörfattare(string författarensNamn)
+        {
+            var författare = Författare.FirstOrDefault(f => f.Namn.Equals(författarensNamn, StringComparison.OrdinalIgnoreCase));
+            if (författare == null)
+            {
+                Console.WriteLine($"Ingen författare hittades med namnet: {författarensNamn}");
+                return;
+            }
+
+            var filtreradeBöcker = Böcker.Where(b => b.FörfattareId == författare.Id).ToList();
+            if (!filtreradeBöcker.Any())
+            {
+                Console.WriteLine($"Inga böcker hittades för författaren: {författarensNamn}");
+                return;
+            }
+
+            foreach (var bok in filtreradeBöcker)
+            {
+                Console.WriteLine($"ID: {bok.Id}, Titel: {bok.Titel}, Genre: {bok.Genre}, Publiceringsår: {bok.Publiceringsår}");
+            }
+        }
+        public void FiltreraBöckerEfterGenre(string genre)
+        {
+            var filtreradeBöcker = Böcker.Where(bok => bok.Genre.Equals(genre, StringComparison.OrdinalIgnoreCase)).ToList();
+
+            if (filtreradeBöcker.Count == 0)
+            {
+                Console.WriteLine($"Inga böcker hittades med genren: {genre}");
             }
             else
             {
-                Console.WriteLine("Inga författare finns.");
+                Console.WriteLine($"Böcker i genren {genre}:");
+                foreach (var bok in filtreradeBöcker)
+                {
+                    Console.WriteLine($"ID: {bok.Id}, Titel: {bok.Titel}, Författare ID: {bok.FörfattareId}, År: {bok.Publiceringsår}, ISBN: {bok.Isbn}");
+                }
             }
         }
+
     }
 }
-
-

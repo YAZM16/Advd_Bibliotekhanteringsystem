@@ -7,7 +7,7 @@ namespace Advd_Bibliotekhanteringsystem
         public static void Main()
         {
             // Ladda data vid programstart
-            var bibliotek = DataFil.LaddaData();
+            var bibliotek = DataFil.LaddaData() ?? new Bibliotek();
             bool fortsätt = true;
             while (fortsätt)
             {
@@ -16,17 +16,21 @@ namespace Advd_Bibliotekhanteringsystem
                 VisaMeny();
 
                 // Läs användarens val
+               
                 if (!int.TryParse(Console.ReadLine(), out int val))
                 {
                     Console.WriteLine("Felaktig inmatning, försök igen.");
+                    Console.WriteLine("\nTryck på en tangent för att fortsätta...");
+                    Console.ReadKey();
                     continue;
                 }
-
+               
+                
                 switch (val)
                 {
                     case 1:
                         Console.Write("Ange boktitel: ");
-                        string titel = Console.ReadLine();
+                         string titel = Console.ReadLine();
 
                         Console.Write("Ange författarens ID: ");
                         if (!int.TryParse(Console.ReadLine(), out int författareId))
@@ -37,7 +41,7 @@ namespace Advd_Bibliotekhanteringsystem
 
                         Console.Write("Ange genre: ");
                         string genre = Console.ReadLine();
-
+                        
                         Console.Write("Ange publiceringsår: ");
                         if (!int.TryParse(Console.ReadLine(), out int publiceringsår))
                         {
@@ -151,10 +155,21 @@ namespace Advd_Bibliotekhanteringsystem
                     case 8:
                         bibliotek.ListaAllaFörfattare();
                         break;
-
                     case 9:
-                        bibliotek.SparaData();
+                        Console.Write("Ange genre för att filtrera böcker: ");
+                        string filtreringsGenre = Console.ReadLine();
+                        bibliotek.FiltreraBöckerEfterGenre(filtreringsGenre);
+                        break;
+                    case 0:
+                        Console.Write("Ange författarens namn för att filtrera böcker: ");
+                        string författarensNamn = Console.ReadLine();
+                        bibliotek.FiltreraBöckerEfterFörfattare(författarensNamn);
+                        break;
+
+                    case 11:
+                        DataFil.SparaData(bibliotek); // Sparar biblioteket till fil
                         Console.WriteLine("Data sparat. Programmet avslutas.");
+                        fortsätt = false;
                         return;
 
                     default:
@@ -179,7 +194,9 @@ namespace Advd_Bibliotekhanteringsystem
             Console.WriteLine("6. Ta bort författare");
             Console.WriteLine("7. Lista alla böcker");
             Console.WriteLine("8. Lista alla författare");
-            Console.WriteLine("9. Avsluta och spara data");
+            Console.WriteLine("9. Filtrera böcker efter genre");
+            Console.WriteLine("0. Filtrera böcker efter författare");
+            Console.WriteLine("11. Avsluta och spara data");
             Console.Write("Välj ett alternativ: ");
         }
     }

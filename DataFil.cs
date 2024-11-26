@@ -1,6 +1,7 @@
-﻿using System;
+﻿using Newtonsoft.Json;
+using System;
 using System.IO;
-using System.Text.Json;
+using System.Collections.Generic;
 
 namespace Advd_Bibliotekhanteringsystem
 {
@@ -11,16 +12,17 @@ namespace Advd_Bibliotekhanteringsystem
         // Metod för att spara bibliotekets data till en JSON-fil
         public static void SparaData(Bibliotek bibliotek)
         {
-            try
-            {
-                var jsonData = JsonSerializer.Serialize(bibliotek, new JsonSerializerOptions { WriteIndented = true });
-                File.WriteAllText(Filnamn, jsonData);
-                Console.WriteLine("Data har sparats.");
-            }
-            catch (Exception ex)
-            {
-                Console.WriteLine($"Fel vid sparande av data: {ex.Message}");
-            }
+            // Kontrollera om filen ska skapas eller om det är en ny fil
+            string filnamn = "bibliotek.json";
+
+            // Serialisera objektet till JSON-sträng
+            string json = JsonConvert.SerializeObject(bibliotek, Formatting.Indented);
+
+            // Skriv JSON-strängen till fil
+            File.WriteAllText(filnamn, json);
+
+            // Debugging: skriva ut
+            Console.WriteLine("Data sparad: ");
         }
 
         // Metod för att ladda bibliotekets data från en JSON-fil
@@ -28,23 +30,19 @@ namespace Advd_Bibliotekhanteringsystem
         {
             try
             {
-                if (File.Exists(Filnamn))
-                {
-                    var jsonData = File.ReadAllText(Filnamn);
-                    var bibliotek = JsonSerializer.Deserialize<Bibliotek>(jsonData);
-                    return bibliotek;
-                }
-                else
-                {
-                    Console.WriteLine("Ingen datafil hittades, ett nytt bibliotek skapas.");
-                    return new Bibliotek();  // Returnera ett nytt bibliotek om filen inte finns
-                }
+                if (!File.Exists(Filnamn))
+                    return new Bibliotek();
+
+                string json = File.ReadAllText(Filnamn);
+                return JsonConvert.DeserializeObject<Bibliotek>(json);
             }
+
             catch (Exception ex)
             {
                 Console.WriteLine($"Fel vid laddning av data: {ex.Message}");
-                return new Bibliotek();  // Om det uppstår ett fel, returnera ett nytt bibliotek
             }
+
+            return new Bibliotek();
         }
     }
 }
