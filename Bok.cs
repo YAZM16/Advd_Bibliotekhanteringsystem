@@ -8,7 +8,7 @@ namespace Advd_Bibliotekhanteringsystem
         public int Id { get; set; }
         public string Titel { get; set; }
         public int FörfattareId { get; set; }
-        public string Genre { get; set; }
+        public string Genre { get; set; } = string.Empty;
         public int Publiceringsår { get; set; }
         public string Isbn { get; set; }
         public List<int> Recensioner { get; set; } = new List<int>();
