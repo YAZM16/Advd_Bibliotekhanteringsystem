@@ -7,6 +7,7 @@
       "Genre": "Barn",
       "Publiceringsår": 1945,
       "Isbn": "1234567890",
+      "Betyg": null,
       "Recensioner": [
         5,
         4,
@@ -20,6 +21,7 @@
       "Genre": "Datatech",
       "Publiceringsår": 2015,
       "Isbn": "9876543210",
+      "Betyg": null,
       "Recensioner": [
         5,
         5,
@@ -34,6 +36,7 @@
       "Genre": "Datatech",
       "Publiceringsår": 2017,
       "Isbn": "1122334455",
+      "Betyg": null,
       "Recensioner": [
         4,
         4,
@@ -47,6 +50,7 @@
       "Genre": "Historia",
       "Publiceringsår": 2024,
       "Isbn": "999",
+      "Betyg": null,
       "Recensioner": []
     },
     {
@@ -56,6 +60,27 @@
       "Genre": "Barn",
       "Publiceringsår": 2016,
       "Isbn": "978-91",
+      "Betyg": null,
+      "Recensioner": []
+    },
+    {
+      "Id": 6,
+      "Titel": "CuJo",
+      "FörfattareId": 6,
+      "Genre": "Roman",
+      "Publiceringsår": 1981,
+      "Isbn": "96-583",
+      "Betyg": null,
+      "Recensioner": []
+    },
+    {
+      "Id": 7,
+      "Titel": "Gaza",
+      "FörfattareId": 7,
+      "Genre": "War Crime",
+      "Publiceringsår": 1946,
+      "Isbn": "96-99",
+      "Betyg": null,
       "Recensioner": []
     }
   ],
@@ -94,6 +119,12 @@
       "Id": 5,
       "Namn": "Kjell T",
       "Land": "Poland",
+      "BokIds": []
+    },
+    {
+      "Id": 6,
+      "Namn": "stephen King",
+      "Land": "Usa",
       "BokIds": []
     }
   ]

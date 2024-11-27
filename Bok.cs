@@ -11,6 +11,7 @@ namespace Advd_Bibliotekhanteringsystem
         public string Genre { get; set; } = string.Empty;
         public int Publiceringsår { get; set; }
         public string Isbn { get; set; }
+        public int? Betyg { get; set; }
         public List<int> Recensioner { get; set; } = new List<int>();
 
         public void LäggTillBetyg(int betyg)

@@ -1,5 +1,7 @@
-﻿using System;
-using System.Text.Json;
+﻿using System.Collections.Generic;
+using System;
+using Newtonsoft.Json;
+using System.Linq;
 namespace Advd_Bibliotekhanteringsystem
 {
     public class Program
@@ -9,195 +11,280 @@ namespace Advd_Bibliotekhanteringsystem
             // Ladda data vid programstart
             var bibliotek = DataFil.LaddaData() ?? new Bibliotek();
             bool fortsätt = true;
+            int valtAlternativ = 0;
             while (fortsätt)
             {
                 // Rensa skärmen och visa menyn
-                Console.Clear();
-                VisaMeny();
-
                 // Läs användarens val
-               
-                if (!int.TryParse(Console.ReadLine(), out int val))
+                Console.Clear();
+                VisaMeny(valtAlternativ);
+
+                ConsoleKeyInfo knapp = Console.ReadKey(true);
+                switch (knapp.Key)
                 {
-                    Console.WriteLine("Felaktig inmatning, försök igen.");
-                    Console.WriteLine("\nTryck på en tangent för att fortsätta...");
-                    Console.ReadKey();
-                    continue;
-                }
-               
-                
-                switch (val)
-                {
-                    case 1:
-                        Console.Write("Ange boktitel: ");
-                         string titel = Console.ReadLine();
+                    case ConsoleKey.UpArrow:
+                        valtAlternativ = valtAlternativ == 0 ? 11 : valtAlternativ - 1; // Gå upp, wrap runt
+                        break;
 
-                        Console.Write("Ange författarens ID: ");
-                        if (!int.TryParse(Console.ReadLine(), out int författareId))
+                    case ConsoleKey.DownArrow:
+                        valtAlternativ = (valtAlternativ + 1) % 12; // Gå ner, wrap runt
+                        break;
+
+                    case ConsoleKey.Enter:
+                        Console.Clear();
+                        switch (valtAlternativ)
                         {
-                            Console.WriteLine("Ogiltigt författar-ID.");
-                            break;
+                            case 0:
+                                LäggTillBok(bibliotek);
+                                break;
+                            case 1:
+                                LäggTillFörfattare(bibliotek);
+                                break;
+                            case 2:
+                                UppdateraBok(bibliotek);
+                                break;
+                            case 3:
+                                UppdateraFörfattare(bibliotek);
+                                break;
+                            case 4:
+                                TaBortBok(bibliotek);
+                                break;
+                            case 5:
+                                TaBortFörfattare(bibliotek);
+                                break;
+                            case 6:
+                                bibliotek.ListaAllaBöcker();
+                                break;
+                            case 7:
+                                bibliotek.ListaAllaFörfattare();
+                                break;
+                            case 8:
+                                FiltreraBöckerEfterGenre(bibliotek);
+                                break;
+                            case 9:
+                                FiltreraBöckerEfterFörfattare(bibliotek);
+                                break;
+                            case 10:
+                                LäggTillBetygFörBok(bibliotek);
+                                break;
+                            case 11:
+                                DataFil.SparaData(bibliotek);
+                                Console.WriteLine("Data sparad. Programmet avslutas.");
+                                fortsätt = false;
+                                break;
                         }
-
-                        Console.Write("Ange genre: ");
-                        string genre = Console.ReadLine();
-                        
-                        Console.Write("Ange publiceringsår: ");
-                        if (!int.TryParse(Console.ReadLine(), out int publiceringsår))
-                        {
-                            Console.WriteLine("Ogiltigt årtal.");
-                            break;
-                        }
-
-                        Console.Write("Ange ISBN: ");
-                        string isbn = Console.ReadLine();
-
-                        var nyBok = new Bok { Titel = titel, FörfattareId = författareId, Genre = genre, Publiceringsår = publiceringsår, Isbn = isbn };
-                        bibliotek.LäggTillBok(nyBok);
-                        Console.WriteLine("Ny bok har lagts till.");
-                        break;
-
-                    case 2:
-                        Console.Write("Ange författarens namn: ");
-                        string namn = Console.ReadLine();
-
-                        Console.Write("Ange land: ");
-                        string land = Console.ReadLine();
-
-                        var nyFörfattare = new Författare { Namn = namn, Land = land };
-                        bibliotek.LäggTillFörfattare(nyFörfattare);
-                        Console.WriteLine("Ny författare har lagts till.");
-                        break;
-
-                    case 3:
-                        Console.Write("Ange bok-ID för uppdatering: ");
-                        if (!int.TryParse(Console.ReadLine(), out int bokId))
-                        {
-                            Console.WriteLine("Ogiltigt bok-ID.");
-                            break;
-                        }
-
-                        Console.Write("Ange ny titel: ");
-                        titel = Console.ReadLine();
-
-                        Console.Write("Ange ny författare-ID: ");
-                        if (!int.TryParse(Console.ReadLine(), out författareId))
-                        {
-                            Console.WriteLine("Ogiltigt författar-ID.");
-                            break;
-                        }
-
-                        Console.Write("Ange ny genre: ");
-                        genre = Console.ReadLine();
-
-                        Console.Write("Ange nytt publiceringsår: ");
-                        if (!int.TryParse(Console.ReadLine(), out publiceringsår))
-                        {
-                            Console.WriteLine("Ogiltigt årtal.");
-                            break;
-                        }
-
-                        Console.Write("Ange nytt ISBN: ");
-                        isbn = Console.ReadLine();
-
-                        var uppdateradBok = new Bok { Id = bokId, Titel = titel, FörfattareId = författareId, Genre = genre, Publiceringsår = publiceringsår, Isbn = isbn };
-                        bibliotek.UppdateraBok(bokId, uppdateradBok);
-                        Console.WriteLine("Bokdetaljer har uppdaterats.");
-                        break;
-
-                    case 4:
-                        Console.Write("Ange författar-ID för uppdatering: ");
-                        if (!int.TryParse(Console.ReadLine(), out int författareUppId))
-                        {
-                            Console.WriteLine("Ogiltigt författar-ID.");
-                            break;
-                        }
-
-                        Console.Write("Ange nytt namn: ");
-                        namn = Console.ReadLine();
-
-                        Console.Write("Ange nytt land: ");
-                        land = Console.ReadLine();
-
-                        var uppdateradFörfattare = new Författare { Id = författareUppId, Namn = namn, Land = land };
-                        bibliotek.UppdateraFörfattare(författareUppId, uppdateradFörfattare);
-                        Console.WriteLine("Författardetaljer har uppdaterats.");
-                        break;
-
-                    case 5:
-                        Console.Write("Ange bok-ID att ta bort: ");
-                        if (!int.TryParse(Console.ReadLine(), out bokId))
-                        {
-                            Console.WriteLine("Ogiltigt bok-ID.");
-                            break;
-                        }
-
-                        bibliotek.TaBortBok(bokId);
-                        Console.WriteLine("Bok har tagits bort.");
-                        break;
-
-                    case 6:
-                        Console.Write("Ange författar-ID att ta bort: ");
-                        if (!int.TryParse(Console.ReadLine(), out författareUppId))
-                        {
-                            Console.WriteLine("Ogiltigt författar-ID.");
-                            break;
-                        }
-
-                        bibliotek.TaBortFörfattare(författareUppId);
-                        Console.WriteLine("Författare och dess böcker har tagits bort.");
-                        break;
-
-                    case 7:
-                        bibliotek.ListaAllaBöcker();
-                        break;
-
-                    case 8:
-                        bibliotek.ListaAllaFörfattare();
-                        break;
-                    case 9:
-                        Console.Write("Ange genre för att filtrera böcker: ");
-                        string filtreringsGenre = Console.ReadLine();
-                        bibliotek.FiltreraBöckerEfterGenre(filtreringsGenre);
-                        break;
-                    case 0:
-                        Console.Write("Ange författarens namn för att filtrera böcker: ");
-                        string författarensNamn = Console.ReadLine();
-                        bibliotek.FiltreraBöckerEfterFörfattare(författarensNamn);
-                        break;
-
-                    case 11:
-                        DataFil.SparaData(bibliotek); // Sparar biblioteket till fil
-                        Console.WriteLine("Data sparat. Programmet avslutas.");
-                        fortsätt = false;
-                        return;
-
-                    default:
-                        Console.WriteLine("Ogiltigt val, försök igen.");
+                        Console.WriteLine("\nTryck på en tangent för att fortsätta...");
+                        Console.ReadKey();
                         break;
                 }
-
-                // Vänta en stund innan menyn visas igen
-                Console.WriteLine("\nTryck på en tangent för att fortsätta...");
-                Console.ReadKey();
             }
         }
 
-        static void VisaMeny()
+        static void VisaMeny(int valtAlternativ)
         {
-            Console.WriteLine("\n--- Bibliotek Meny ---");
-            Console.WriteLine("1. Lägg till ny bok");
-            Console.WriteLine("2. Lägg till ny författare");
-            Console.WriteLine("3. Uppdatera bokdetaljer");
-            Console.WriteLine("4. Uppdatera författardetaljer");
-            Console.WriteLine("5. Ta bort bok");
-            Console.WriteLine("6. Ta bort författare");
-            Console.WriteLine("7. Lista alla böcker");
-            Console.WriteLine("8. Lista alla författare");
-            Console.WriteLine("9. Filtrera böcker efter genre");
-            Console.WriteLine("0. Filtrera böcker efter författare");
-            Console.WriteLine("11. Avsluta och spara data");
-            Console.Write("Välj ett alternativ: ");
+            string[] menyAlternativ =
+            {
+                "Lägg till ny bok",
+                "Lägg till ny författare",
+                "Uppdatera bokdetaljer",
+                "Uppdatera författardetaljer",
+                "Ta bort bok",
+                "Ta bort författare",
+                "Lista alla böcker",
+                "Lista alla författare",
+                "Filtrera böcker efter genre",
+                "Filtrera böcker efter författare",
+                "Lägg till betyg för bok",
+                "Avsluta och spara data"
+            };
+
+            Console.WriteLine("--- Bibliotek Meny ---");
+            for (int i = 0; i < menyAlternativ.Length; i++)
+            {
+                if (i == valtAlternativ)
+                {
+                    Console.WriteLine($"--> {menyAlternativ[i]}");
+                }
+                else
+                {
+                    Console.WriteLine($"    {menyAlternativ[i]}");
+                }
+            }
+        }
+
+
+        static void LäggTillBok(Bibliotek bibliotek)
+        {
+            Console.Write("Ange boktitel: ");
+            string titel = Console.ReadLine();
+
+            Console.Write("Ange författarens ID: ");
+            if (!int.TryParse(Console.ReadLine(), out int författareId))
+            {
+                Console.WriteLine("Ogiltigt författar-ID.");
+                return;
+            }
+
+            Console.Write("Ange genre: ");
+            string genre = Console.ReadLine();
+
+            Console.Write("Ange publiceringsår: ");
+            if (!int.TryParse(Console.ReadLine(), out int publiceringsår))
+            {
+                Console.WriteLine("Ogiltigt årtal.");
+                return;
+            }
+
+            Console.Write("Ange ISBN: ");
+            string isbn = Console.ReadLine();
+
+            var nyBok = new Bok { Titel = titel, FörfattareId = författareId, Genre = genre, Publiceringsår = publiceringsår, Isbn = isbn };
+            bibliotek.LäggTillBok(nyBok);
+            Console.WriteLine("Ny bok har lagts till.");
+        }
+
+        static void LäggTillFörfattare(Bibliotek bibliotek)
+        {
+            Console.Write("Ange författarens namn: ");
+            string namn = Console.ReadLine();
+
+            Console.Write("Ange land: ");
+            string land = Console.ReadLine();
+
+            var nyFörfattare = new Författare { Namn = namn, Land = land };
+            bibliotek.LäggTillFörfattare(nyFörfattare);
+            Console.WriteLine("Ny författare har lagts till.");
+        }
+
+        static void UppdateraBok(Bibliotek bibliotek)
+        {
+            Console.Write("Ange bok-ID för uppdatering: ");
+            if (!int.TryParse(Console.ReadLine(), out int bokId))
+            {
+                Console.WriteLine("Ogiltigt bok-ID.");
+                return;
+            }
+
+            Console.Write("Ange ny titel: ");
+            string titel = Console.ReadLine();
+
+            Console.Write("Ange ny författare-ID: ");
+            if (!int.TryParse(Console.ReadLine(), out int författareId))
+            {
+                Console.WriteLine("Ogiltigt författar-ID.");
+                return;
+            }
+
+            Console.Write("Ange ny genre: ");
+            string genre = Console.ReadLine();
+
+            Console.Write("Ange nytt publiceringsår: ");
+            if (!int.TryParse(Console.ReadLine(), out int publiceringsår))
+            {
+                Console.WriteLine("Ogiltigt årtal.");
+                return;
+            }
+
+            Console.Write("Ange nytt ISBN: ");
+            string isbn = Console.ReadLine();
+
+            var uppdateradBok = new Bok { Id = bokId, Titel = titel, FörfattareId = författareId, Genre = genre, Publiceringsår = publiceringsår, Isbn = isbn };
+            bibliotek.UppdateraBok(bokId, uppdateradBok);
+            Console.WriteLine("Bokdetaljer har uppdaterats.");
+        }
+
+        static void UppdateraFörfattare(Bibliotek bibliotek)
+        {
+            Console.Write("Ange författar-ID för uppdatering: ");
+            if (!int.TryParse(Console.ReadLine(), out int författareId))
+            {
+                Console.WriteLine("Ogiltigt författar-ID.");
+                return;
+            }
+
+            Console.Write("Ange nytt namn: ");
+            string namn = Console.ReadLine();
+
+            Console.Write("Ange nytt land: ");
+            string land = Console.ReadLine();
+
+            var uppdateradFörfattare = new Författare { Id = författareId, Namn = namn, Land = land };
+            bibliotek.UppdateraFörfattare(författareId, uppdateradFörfattare);
+            Console.WriteLine("Författardetaljer har uppdaterats.");
+        }
+
+        static void TaBortBok(Bibliotek bibliotek)
+        {
+            Console.Write("Ange bok-ID att ta bort: ");
+            if (!int.TryParse(Console.ReadLine(), out int bokId))
+            {
+                Console.WriteLine("Ogiltigt bok-ID.");
+                return;
+            }
+
+            bibliotek.TaBortBok(bokId);
+            Console.WriteLine("Bok har tagits bort.");
+        }
+
+        static void TaBortFörfattare(Bibliotek bibliotek)
+        {
+            Console.Write("Ange författar-ID att ta bort: ");
+            if (!int.TryParse(Console.ReadLine(), out int författareId))
+            {
+                Console.WriteLine("Ogiltigt författar-ID.");
+                return;
+            }
+
+            bibliotek.TaBortFörfattare(författareId);
+            Console.WriteLine("Författare och dess böcker har tagits bort.");
+        }
+
+        static void FiltreraBöckerEfterGenre(Bibliotek bibliotek)
+        {
+            Console.Write("Ange genre för att filtrera böcker: ");
+            string genre = Console.ReadLine();
+            bibliotek.FiltreraBöckerEfterGenre(genre);
+        }
+
+        static void FiltreraBöckerEfterFörfattare(Bibliotek bibliotek)
+        {
+            Console.Write("Ange författarens namn för att filtrera böcker: ");
+            string namn = Console.ReadLine();
+            bibliotek.FiltreraBöckerEfterFörfattare(namn);
+        }
+
+        static void LäggTillBetygFörBok(Bibliotek bibliotek)
+        {
+            Console.Write("Ange bok-ID för att lägga till betyg: ");
+            if (!int.TryParse(Console.ReadLine(), out int bokId))
+            {
+                Console.WriteLine("Ogiltigt bok-ID.");
+                return;
+            }
+
+            Console.Write("Ange betyg (1-5): ");
+            if (!int.TryParse(Console.ReadLine(), out int betyg) || betyg < 1 || betyg > 5)
+            {
+                Console.WriteLine("Betyg måste vara mellan 1 och 5.");
+                return;
+            }
+
+            var bok = bibliotek.Böcker.FirstOrDefault(b => b.Id == bokId);
+            if (bok != null)
+            {
+                bok.Betyg = betyg;
+                Console.WriteLine("Betyg har lagts till.");
+            }
+            else
+            {
+                Console.WriteLine("Bok hittades inte.");
+            }
         }
     }
 }
+
+
+
+
+
+

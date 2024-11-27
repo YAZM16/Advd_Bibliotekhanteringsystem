@@ -13,7 +13,7 @@ namespace Advd_Bibliotekhanteringsystem
         
         public List<Författare> Författare { get; set; } = new List<Författare>();
 
-         private const string Filnamn = @"C:\Users\user\source\repos\Advd_Bibliotekhanteringsystem_1\LibraryData.json";
+         private const string Filnamn = @"C:\Users\user\source\repos\Advd_Bibliotekhanteringsystem_2\LibraryData.json";
 
 
         public Bibliotek()
@@ -119,7 +119,7 @@ namespace Advd_Bibliotekhanteringsystem
         }
 
        public void ListaAllaBöcker()
-        {
+       {
             if (!Böcker.Any()) // Kontrollerar om det finns några böcker i listan.
             {
                 Console.WriteLine("Inga böcker finns i biblioteket."); // Meddelar användaren om listan är tom.
@@ -135,7 +135,7 @@ namespace Advd_Bibliotekhanteringsystem
                 var författare = Författare.FirstOrDefault(f => f.Id == bok.FörfattareId)?.Namn ?? "Okänd författare";
                 Console.WriteLine($"ID: {bok.Id}, Titel: {bok.Titel}, Författare: {författare}, Genre: {bok.Genre}, Publiceringsår: {bok.Publiceringsår}");
             }
-        }
+       }
 
         /// <summary>
         /// Filtrerar böcker baserat på en angiven genre.
@@ -194,6 +194,35 @@ namespace Advd_Bibliotekhanteringsystem
                     Console.WriteLine($"ID: {bok.Id}, Titel: {bok.Titel}, Författare ID: {bok.FörfattareId}, År: {bok.Publiceringsår}, ISBN: {bok.Isbn}");
                 }
             }
+            void LäggTillBetyg()
+            {
+                Console.WriteLine("Ange bok-ID för att lägga till betyg:");
+                if (!int.TryParse(Console.ReadLine(), out int bokId))
+                {
+                    Console.WriteLine("Ogiltigt bok-ID. Försök igen.");
+                    return;
+                }
+
+                var bok = Böcker.FirstOrDefault(b => b.Id == bokId);
+                if (bok == null)
+                {
+                    Console.WriteLine("Bok med angivet ID hittades inte.");
+                    return;
+                }
+
+                Console.WriteLine("Ange betyg (1-5):");
+                if (!int.TryParse(Console.ReadLine(), out int betyg) || betyg < 1 || betyg > 5)
+                {
+                    Console.WriteLine("Ogiltigt betyg. Ange ett värde mellan 1 och 5.");
+                    return;
+                }
+
+                bok.Betyg = betyg;
+                SparaData(); // Spara ändringarna till filen
+                Console.WriteLine($"Betyget för boken \"{bok.Titel}\" har uppdaterats till {betyg}.");
+            }
+
+
         }
 
     }
