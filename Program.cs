@@ -23,11 +23,11 @@ namespace Advd_Bibliotekhanteringsystem
                 switch (knapp.Key)
                 {
                     case ConsoleKey.UpArrow:
-                        valtAlternativ = valtAlternativ == 0 ? 11 : valtAlternativ - 1; // Gå upp, wrap runt
+                        valtAlternativ = valtAlternativ == 0 ? 13 : valtAlternativ - 1; // Gå upp, wrap runt
                         break;
 
                     case ConsoleKey.DownArrow:
-                        valtAlternativ = (valtAlternativ + 1) % 12; // Gå ner, wrap runt
+                        valtAlternativ = (valtAlternativ + 1) % 13; // Gå ner, wrap runt
                         break;
 
                     case ConsoleKey.Enter:
@@ -65,9 +65,18 @@ namespace Advd_Bibliotekhanteringsystem
                                 FiltreraBöckerEfterFörfattare(bibliotek);
                                 break;
                             case 10:
+                                // Sortera böcker efter publiceringsår med LINQ
+                                ListaBöckerSorteradeEfterPubliceringsår(bibliotek);
+                                break;
+
+                            case 11:
+                                // Sortera författare efter namn med LINQ
+                                ListaFörfattareSorteradeEfterNamn(bibliotek);
+                                break;
+                            case 12:
                                 LäggTillBetygFörBok(bibliotek);
                                 break;
-                            case 11:
+                            case 13:
                                 DataFil.SparaData(bibliotek);
                                 Console.WriteLine("Data sparad. Programmet avslutas.");
                                 fortsätt = false;
@@ -94,6 +103,8 @@ namespace Advd_Bibliotekhanteringsystem
                 "Lista alla författare",
                 "Filtrera böcker efter genre",
                 "Filtrera böcker efter författare",
+                "Sortera böcker efter publiceringsår",
+                "Sortera författare efter namn",
                 "Lägg till betyg för bok",
                 "Avsluta och spara data"
             };
@@ -239,18 +250,50 @@ namespace Advd_Bibliotekhanteringsystem
             Console.WriteLine("Författare och dess böcker har tagits bort.");
         }
 
+        // Filtrera böcker efter genre
         static void FiltreraBöckerEfterGenre(Bibliotek bibliotek)
         {
             Console.Write("Ange genre för att filtrera böcker: ");
             string genre = Console.ReadLine();
-            bibliotek.FiltreraBöckerEfterGenre(genre);
-        }
 
+            var filtreradeBöcker = bibliotek.Böcker
+                .Where(b => b.Genre.Equals(genre, StringComparison.OrdinalIgnoreCase))
+                .ToList();
+
+            if (!filtreradeBöcker.Any())
+            {
+                Console.WriteLine("Inga böcker hittades för den angivna genren.");
+                return;
+            }
+
+            Console.WriteLine("--- Filtrerade Böcker ---");
+            foreach (var bok in filtreradeBöcker)
+            {
+                Console.WriteLine($"ID: {bok.Id}, Titel: {bok.Titel}, Författare-ID: {bok.FörfattareId}, Genre: {bok.Genre}");
+            }
+        }
+        // Filtrera böcker efter författare
         static void FiltreraBöckerEfterFörfattare(Bibliotek bibliotek)
         {
             Console.Write("Ange författarens namn för att filtrera böcker: ");
-            string namn = Console.ReadLine();
-            bibliotek.FiltreraBöckerEfterFörfattare(namn);
+            string författarensNamn = Console.ReadLine();
+
+            var filtreradeBöcker = bibliotek.Böcker
+                .Where(b => bibliotek.Författare
+                    .Any(f => f.Id == b.FörfattareId && f.Namn.Contains(författarensNamn, StringComparison.OrdinalIgnoreCase)))
+                .ToList();
+
+            if (!filtreradeBöcker.Any())
+            {
+                Console.WriteLine("Inga böcker hittades för den angivna författaren.");
+                return;
+            }
+
+            Console.WriteLine("--- Filtrerade Böcker ---");
+            foreach (var bok in filtreradeBöcker)
+            {
+                Console.WriteLine($"ID: {bok.Id}, Titel: {bok.Titel}, Författare-ID: {bok.FörfattareId}, Genre: {bok.Genre}");
+            }
         }
 
         static void LäggTillBetygFörBok(Bibliotek bibliotek)
@@ -259,29 +302,73 @@ namespace Advd_Bibliotekhanteringsystem
             if (!int.TryParse(Console.ReadLine(), out int bokId))
             {
                 Console.WriteLine("Ogiltigt bok-ID.");
-                return;
+               
             }
 
             Console.Write("Ange betyg (1-5): ");
             if (!int.TryParse(Console.ReadLine(), out int betyg) || betyg < 1 || betyg > 5)
             {
                 Console.WriteLine("Betyg måste vara mellan 1 och 5.");
-                return;
+                
             }
 
-            var bok = bibliotek.Böcker.FirstOrDefault(b => b.Id == bokId);
-            if (bok != null)
+            var bokAttBetygsätta = bibliotek.Böcker.FirstOrDefault(b => b.Id == bokId);
+            if (bokAttBetygsätta != null)
             {
-                bok.Betyg = betyg;
-                Console.WriteLine("Betyg har lagts till.");
+                bokAttBetygsätta.LäggTillBetyg(betyg);
+                DataFil.SparaData(bibliotek); // Spara ändringarna
+                Console.WriteLine($"Betyget {betyg} har lagts till boken \"{bokAttBetygsätta.Titel}\".");
+                Console.WriteLine($"Genomsnittsbetyg: {bokAttBetygsätta.BeräknaGenomsnittBetyg():0.00}");
             }
             else
             {
-                Console.WriteLine("Bok hittades inte.");
+                Console.WriteLine("Ingen bok med angivet ID hittades.");
+            }
+               
+        }
+        // Sortera böcker efter publiceringsår
+        static void ListaBöckerSorteradeEfterPubliceringsår(Bibliotek bibliotek)
+        {
+            var sorteradeBöcker = bibliotek.Böcker
+                .OrderBy(b => b.Publiceringsår)
+                .ToList();
+
+            if (!sorteradeBöcker.Any())
+            {
+                Console.WriteLine("Inga böcker att visa.");
+                return;
+            }
+
+            Console.WriteLine("--- Böcker Sorterade Efter Publiceringsår ---");
+            foreach (var bok in sorteradeBöcker)
+            {
+                Console.WriteLine($"ID: {bok.Id}, Titel: {bok.Titel}, Författare-ID: {bok.FörfattareId}, Publiceringsår: {bok.Publiceringsår}");
+            }
+        }
+
+        // Sortera författare efter namn
+        static void ListaFörfattareSorteradeEfterNamn(Bibliotek bibliotek)
+        {
+            var sorteradeFörfattare = bibliotek.Författare
+                .OrderBy(f => f.Namn)
+                .ToList();
+
+            if (!sorteradeFörfattare.Any())
+            {
+                Console.WriteLine("Inga författare att visa.");
+                return;
+            }
+
+            Console.WriteLine("--- Författare Sorterade Efter Namn ---");
+            foreach (var författare in sorteradeFörfattare)
+            {
+                Console.WriteLine($"ID: {författare.Id}, Namn: {författare.Namn}, Land: {författare.Land}");
             }
         }
     }
 }
+       
+
 
 
 

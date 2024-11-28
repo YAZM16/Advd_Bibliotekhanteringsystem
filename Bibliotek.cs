@@ -13,7 +13,7 @@ namespace Advd_Bibliotekhanteringsystem
         
         public List<Författare> Författare { get; set; } = new List<Författare>();
 
-         private const string Filnamn = @"C:\Users\user\source\repos\Advd_Bibliotekhanteringsystem_2\LibraryData.json";
+        private const string Filnamn = @"C:\Users\user\source\repos\Advd_Bibliotekhanteringsystem_2\LibraryData.json";
 
 
         public Bibliotek()
@@ -26,25 +26,26 @@ namespace Advd_Bibliotekhanteringsystem
         {
             if (File.Exists(Filnamn))
             {
-                try
+                Console.WriteLine("Fil hittades inte, en ny bibliotekfil kommer att skapas.");
+                return;
+            }
+
+            try
+            {
+                var jsonData = File.ReadAllText(Filnamn);
+                var bibliotekData = JsonConvert.DeserializeObject<Bibliotek>(jsonData);
+                if (bibliotekData != null)
                 {
-                    var jsonData = File.ReadAllText(Filnamn);
-                    if (string.IsNullOrEmpty(jsonData))
-                    {
-                        var data = JsonConvert.DeserializeObject<Bibliotek>(jsonData);
-                        if (data != null)
-                        {
-                            Böcker = data.Böcker ?? new List<Bok>();
-                            Författare = data.Författare ?? new List<Författare>();
-                        }
-                    }
-                }
-                catch (Exception ex)
-                {
-                    Console.WriteLine($"Fel vid läsning av fil: {ex.Message}");
+                    Böcker = bibliotekData.Böcker ?? new List<Bok>();
+                    Författare = bibliotekData.Författare ?? new List<Författare>();
                 }
             }
+            catch (Exception ex)
+            {
+                Console.WriteLine($"Fel vid laddning av data: {ex.Message}");
+            }
         }
+
 
         // Metod för att spara data till filen
         public void SparaData()
@@ -87,6 +88,7 @@ namespace Advd_Bibliotekhanteringsystem
                 bok.Genre = uppdateradBok.Genre;
                 bok.Publiceringsår = uppdateradBok.Publiceringsår;
                 bok.Isbn = uppdateradBok.Isbn;
+                bok.Betyg = uppdateradBok.Betyg;
                 SparaData();
             }
         }
@@ -194,35 +196,7 @@ namespace Advd_Bibliotekhanteringsystem
                     Console.WriteLine($"ID: {bok.Id}, Titel: {bok.Titel}, Författare ID: {bok.FörfattareId}, År: {bok.Publiceringsår}, ISBN: {bok.Isbn}");
                 }
             }
-            void LäggTillBetyg()
-            {
-                Console.WriteLine("Ange bok-ID för att lägga till betyg:");
-                if (!int.TryParse(Console.ReadLine(), out int bokId))
-                {
-                    Console.WriteLine("Ogiltigt bok-ID. Försök igen.");
-                    return;
-                }
-
-                var bok = Böcker.FirstOrDefault(b => b.Id == bokId);
-                if (bok == null)
-                {
-                    Console.WriteLine("Bok med angivet ID hittades inte.");
-                    return;
-                }
-
-                Console.WriteLine("Ange betyg (1-5):");
-                if (!int.TryParse(Console.ReadLine(), out int betyg) || betyg < 1 || betyg > 5)
-                {
-                    Console.WriteLine("Ogiltigt betyg. Ange ett värde mellan 1 och 5.");
-                    return;
-                }
-
-                bok.Betyg = betyg;
-                SparaData(); // Spara ändringarna till filen
-                Console.WriteLine($"Betyget för boken \"{bok.Titel}\" har uppdaterats till {betyg}.");
-            }
-
-
+           
         }
 
     }

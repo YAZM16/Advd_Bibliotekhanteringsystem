@@ -12,7 +12,12 @@ namespace Advd_Bibliotekhanteringsystem
         public int Publiceringsår { get; set; }
         public string Isbn { get; set; }
         public int? Betyg { get; set; }
+        public string Recension { get; set; }
         public List<int> Recensioner { get; set; } = new List<int>();
+
+
+
+        public double BeräknaGenomsnittBetyg() => Recensioner.Count > 0 ? Recensioner.Average() : 0;
 
         public void LäggTillBetyg(int betyg)
         {
@@ -21,7 +26,5 @@ namespace Advd_Bibliotekhanteringsystem
             else
                 Console.WriteLine("Betyget måste vara mellan 1 och 5.");
         }
-
-        public double BeräknaGenomsnittBetyg() => Recensioner.Count > 0 ? Recensioner.Average() : 0;
     }
 }

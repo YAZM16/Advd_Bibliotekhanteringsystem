@@ -82,6 +82,16 @@
       "Isbn": "96-99",
       "Betyg": null,
       "Recensioner": []
+    },
+    {
+      "Id": 8,
+      "Titel": "Test",
+      "FörfattareId": 7,
+      "Genre": "Tech",
+      "Publiceringsår": 2024,
+      "Isbn": "98-98",
+      "Betyg": null,
+      "Recensioner": []
     }
   ],
   "Författare": [
@@ -125,6 +135,12 @@
       "Id": 6,
       "Namn": "stephen King",
       "Land": "Usa",
+      "BokIds": []
+    },
+    {
+      "Id": 7,
+      "Namn": "YM",
+      "Land": "Sverige",
       "BokIds": []
     }
   ]
