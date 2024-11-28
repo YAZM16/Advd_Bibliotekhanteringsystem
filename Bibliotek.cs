@@ -13,7 +13,7 @@ namespace Advd_Bibliotekhanteringsystem
         
         public List<Författare> Författare { get; set; } = new List<Författare>();
 
-        private const string Filnamn = @"C:\Users\user\source\repos\Advd_Bibliotekhanteringsystem_2\LibraryData.json";
+        public const string Filnamn = @"C:\Users\user\source\repos\Advd_Bibliotekhanteringsystem\LibraryData.json";
 
 
         public Bibliotek()
